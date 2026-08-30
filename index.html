@@ -588,7 +588,7 @@
                     </div>
                     <p class="sidebar__photo-caption" id="placePhotoCaption"></p>
                     <div class="sidebar__etymology">
-                        <span class="sidebar__etymology-label">О названии</span>
+                        <span class="sidebar__etymology-label">Почему так названо</span>
                         <span id="placeEtymology"></span>
                     </div>
                     </div>
@@ -646,7 +646,7 @@
                 <p class="page__text">
                     <strong>Rahvahan kartta</strong> – это проект, создаваемый вами и для вас! Если вы знаете местные названия, 
                     которые ещё не отраженные на нашей карте, или располагаете дополнительной информацией 
-                    об уже отмеченных топонимах, пожалуйста, напишите на почту проекта <strong>***</strong>. 
+                    об уже отмеченных топонимах, пожалуйста, напишите <a href="https://vk.com/rukajarvi" target="_blank" rel="noopener noreferrer">в личные сообщения автору проекта</a>. 
                     Ваш вклад поможет сделать карту более полной и точной, чтобы сохранить бесценное наследие для будущих поколений.
                 </p>
                     <p class="page__text">
@@ -665,58 +665,61 @@
     <script>
         (function() {
              const placesData = [
-  { id: '1', lat: 64.110361, lng: 32.398475, name: 'Остров', type: 'остров', photo: 'photo_jpg/ostrov.jpg', photoCaption: 'Фотография автора проекта.', etymology: '-' },
+  { id: '1', lat: 64.110361, lng: 32.398475, name: 'Остров', type: 'остров', photo: 'photo_jpg/ostrov.jpg', photoCaption: 'Фотография автора проекта', etymology: '-' },
   { id: '2', lat: 64.109325, lng: 32.372066, name: 'Пятая биржа', type: 'место'},
-  { id: '3', lat: 64.116141, lng: 32.440873, name: 'Старая Тикша', type: 'место', photo: 'photo_jpg/tiiksi.jpg', photoCaption: 'Фотография автора проекта.', etymology: '-' },
+  { id: '3', lat: 64.116141, lng: 32.440873, name: 'Старая Тикша', type: 'место', photo: 'photo_jpg/tiiksi.jpg', photoCaption: 'Фотография автора проекта', etymology: '-' },
   { id: '4', lat: 64.073297, lng: 32.785140, name: 'Патракеевская дорога', type: 'дорога', photo: 'photo_jpg/patrakeev.jpg', photoCaption: 'Фотография автора проекта.', etymology: '-' },
-  { id: '5', lat: 64.093935, lng: 32.844643, name: 'Копачовская биржа', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '6', lat: 64.089364, lng: 32.785551, name: 'Кузница', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '7', lat: 64.089854, lng: 32.572086, name: 'Финская нырялка', type: 'место', photo: 'photo_jpg/nyralka.jpg', photoCaption: 'Фотография автора проекта.', etymology: '-' },
-  { id: '11', lat: 64.084697, lng: 32.775296, name: 'Школьный мыс', type: 'мыс', photo: 'photo_jpg/shkolanniemi.jpg', photoCaption: 'Фотография автора проекта.', etymology: '-' },
+  { id: '5', lat: 64.093935, lng: 32.844643, name: 'Копачовская биржа', type: 'место'},
+  { id: '6', lat: 64.089364, lng: 32.785551, name: 'Кузница', type: 'место'},
+  { id: '7', lat: 64.089854, lng: 32.572086, name: 'Финская нырялка', type: 'место', photo: 'photo_jpg/nyralka.jpg', photoCaption: 'Фотография автора проекта', etymology: '-' },
+  { id: '9', lat: 64.079861, lng: 32.782754, name: 'Кулацкий посёлок', type: 'место', },
+  { id: '10', lat: 64.079950, lng: 32.773141, name: 'Грезинская горка', type: 'гора', },
+  { id: '11', lat: 64.084697, lng: 32.775296, name: 'Школьный мыс', type: 'мыс', photo: 'photo_jpg/shkolanniemi.jpg', photoCaption: 'Фотография автора проекта', etymology: '-' },
   { id: '12', lat: 64.336488, lng: 32.367095, name: 'Чуккури', type: 'гора', photo: '-', photoCaption: '-', etymology: 'Название произошло от карельского čukkuri, что означает возвышенность.' },
   { id: '13', lat: 64.242431, lng: 32.377223, name: 'Хауда-порог', type: 'порог', photo: '-', photoCaption: '-', etymology: 'ск. hauda, hauta ‘яма, углубление; ложбина; впадина; могила; картофельное хранилище или яма’,' },
   { id: '14', lat: 64.119892, lng: 32.397562, name: 'Хутка', type: 'водоём', photo: 'photo_jpg/hutto.jpg', photoCaption: 'Вид на Хутоламбину со стороны ул. Набережная. Фотография автора проекта.', etymology: 'Ламбина в посёлке Тишка. Название произошло от карельского huttu - место (болото) с мягкой почвой.' },
-  { id: '15', lat: 64.214144, lng: 32.387351, name: 'Лоухи-порог', type: 'порог', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '16', lat: 64.251703, lng: 32.438857, name: 'Орголамбина', type: 'водоём', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '17', lat: 64.125816, lng: 32.668157, name: 'Цыганская ламбина', type: 'водоём', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '18', lat: 64.104730, lng: 32.651506, name: '85-я гора', type: 'гора', photo: 'photo_jpg/85gora.jpg', photoCaption: 'Фотография автора проекта.', etymology: '-' },
-  { id: '19', lat: 64.101196, lng: 32.862857, name: '75-я гора', type: 'гора', photo: 'photo_jpg/75gora.jpg', photoCaption: 'Фотография автора проекта.', etymology: '-' },
-  { id: '20', lat: 64.123790, lng: 32.647247, name: 'Перашуо', type: 'болото', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '21', lat: 64.145059, lng: 32.360916, name: 'Андронова гора', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '22', lat: 64.187547, lng: 32.379798, name: 'Еловая гора', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '23', lat: 64.323251, lng: 32.276115, name: 'Келлогора', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '24', lat: 64.110452, lng: 32.202987, name: 'Марьявара', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '25', lat: 64.160027, lng: 32.962074, name: 'Шилос/Шелойс', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '27', lat: 64.126833, lng: 32.506429, name: 'Малая Тикша', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '28', lat: 64.159025, lng: 32.322668, name: 'Иванова Гора', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '29', lat: 63.812535, lng: 33.188568, name: 'Коргуба', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '30', lat: 63.856405, lng: 33.156738, name: 'Пизиниеми', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '31', lat: 64.102622, lng: 32.916007, name: 'Старая Онда', type: 'место', photo: 'photo_jpg/oldonda.jpg', photoCaption: 'Фотография автора проекта.', etymology: '-' },
-  { id: '32', lat: 64.081935, lng: 32.777070, name: 'Три комара', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '33', lat: 64.095335, lng: 32.742203, name: 'Чёрная речка', type: 'река', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '34', lat: 64.078365, lng: 32.785051, name: 'Коробка', type: 'место', photo: '-', photoCaption: '-', etymology: 'Так называли футбольное поле' },
-  { id: '35', lat: 63.990651, lng: 32.795264, name: 'Телевышка', type: 'место', photo: '-', photoCaption: '-', etymology: 'Бывшая базовая станция РТРС, сейчас базовая станция сотового оператора' },
-  { id: '36', lat: 64.109682, lng: 32.946497, name: 'Минные поля', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '38', lat: 64.059962, lng: 32.727069, name: 'Маткаламбинский ручей', type: 'река', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '39', lat: 64.215189, lng: 32.685312, name: 'Кунжиполе/Плотвиная (Кюнжипуали)', type: 'водоём', photo: 'photo_jpg/kyngi.jpg', photoCaption: 'Фотография автора проекта.', etymology: 'Точная этимология топонима "Кюнжипуали" не установлена. Жители села Ругозеро называют данный водоём "Кунжиполе", для жителей посёлка Ледмозеро данный водоём известен как "Плотвиная".' },
-  { id: '40', lat: 64.150598, lng: 32.636260, name: 'Шараярви/Дальняя', type: 'водоём', photo: '-', photoCaption: '-', etymology: 'Шараярви - так называют жители села Ругозеро, Дальняя - так называют жители посёлка Тикша' },
-  { id: '41', lat: 64.119138, lng: 32.480964, name: 'Декка-пролив', type: 'место', photo: '-', photoCaption: '-', etymology: 'Рядом был Декка-хутор, жили Епифановы' },
-  { id: '42', lat: 63.917303, lng: 32.920875, name: 'Пяльгозеро/Тракторное', type: 'водоём', photo: '-', photoCaption: '-', etymology: 'Называется Пяльгозеро, но местные называют это озеро "Тракторным", ибо там находилась МТС' },
-  { id: '43', lat: 64.120938, lng: 32.410536, name: 'Гараж', type: 'место', photo: '-', photoCaption: '-', etymology: 'Территория бывшая гаража леспромхоза' },
+  { id: '15', lat: 64.214144, lng: 32.387351, name: 'Лоухи-порог', type: 'порог'},
+  { id: '16', lat: 64.251703, lng: 32.438857, name: 'Орголамбина', type: 'водоём'},
+  { id: '17', lat: 64.125816, lng: 32.668157, name: 'Цыганская ламбина', type: 'водоём'},
+  { id: '18', lat: 64.104730, lng: 32.651506, name: '85-я гора', type: 'гора', photo: 'photo_jpg/85gora.jpg', photoCaption: 'Фотография автора проекта', etymology: '-' },
+  { id: '19', lat: 64.101196, lng: 32.862857, name: '75-я гора', type: 'гора', photo: 'photo_jpg/75gora.jpg', photoCaption: 'Фотография автора проекта', etymology: '-' },
+  { id: '20', lat: 64.123790, lng: 32.647247, name: 'Перашуо', type: 'болото'},
+  { id: '21', lat: 64.145059, lng: 32.360916, name: 'Андронова гора', type: 'место'},
+  { id: '22', lat: 64.187547, lng: 32.379798, name: 'Еловая гора', type: 'место'},
+  { id: '23', lat: 64.323251, lng: 32.276115, name: 'Келлогора', type: 'место'},
+  { id: '24', lat: 64.110452, lng: 32.202987, name: 'Марьявара', type: 'место'},
+  { id: '25', lat: 64.160027, lng: 32.962074, name: 'Шилос, Шелойс', type: 'место'},
+  { id: '27', lat: 64.126833, lng: 32.506429, name: 'Малая Тикша', type: 'место'},
+  { id: '28', lat: 64.159025, lng: 32.322668, name: 'Иванова Гора', type: 'место'},
+  { id: '29', lat: 63.812535, lng: 33.188568, name: 'Коргуба', type: 'место'},
+  { id: '30', lat: 63.856405, lng: 33.156738, name: 'Пизиниеми', type: 'место'},
+  { id: '31', lat: 64.102622, lng: 32.916007, name: 'Старая Онда', type: 'место', photo: 'photo_jpg/oldonda.jpg', photoCaption: 'Фотография автора проекта', etymology: '-' },
+  { id: '32', lat: 64.081935, lng: 32.777070, name: 'Три комара', type: 'место'},
+  { id: '33', lat: 64.095335, lng: 32.742203, name: 'Чёрная речка', type: 'река'},
+  { id: '34', lat: 64.078365, lng: 32.785051, name: 'Коробка', type: 'место'},
+  { id: '35', lat: 63.990651, lng: 32.795264, name: 'Телевышка', type: 'место'},
+  { id: '36', lat: 64.109682, lng: 32.946497, name: 'Минные поля', type: 'место'},
+  { id: '37', lat: 64.079928, lng: 32.787239, name: 'Гурупелдо', type: 'место'},
+  { id: '38', lat: 64.059962, lng: 32.727069, name: 'Маткаламбинский ручей', type: 'река'},
+  { id: '39', lat: 64.215189, lng: 32.685312, name: 'Кунжиполе/Плотвиная (Кюнжипуали)', type: 'водоём', photo: 'photo_jpg/kyngi.jpg', photoCaption: 'Фотография автора проекта', etymology: 'Точная этимология топонима «Кюнжипуали» не установлена. Однако у этого водоёма есть несколько названий в зависимости от того, кто о нём рассказывает: жители села Ругозеро называют его «Кунжиполе», а для жителей посёлка Ледмозеро он известен как «Плотвиная».' },
+  { id: '40', lat: 64.150598, lng: 32.636260, name: 'Шуаръярви/Шараярви/Дальняя', type: 'водоём', photo: '-', photoCaption: '-', etymology: 'Жители села Ругозеро знают этот водоём как «Шараярви», тогда как в посёлке Тикша его называют «Дальняя».'},
+  { id: '41', lat: 64.119138, lng: 32.480964, name: 'Декка-пролив', type: 'место'},
+  { id: '42', lat: 63.917303, lng: 32.920875, name: 'Тракторное, Пяльга (Пальгозеро)', type: 'водоём', photo: '-', photoCaption: '-', etymology: 'Официальное название этого водоёма — Пяльгозеро. Однако местные жители чаще называют его «Тракторным». Такое прозвище закрепилось за озером из-за того, что рядом располагалась МТС (машинно-тракторная станция).' },
+  { id: '43', lat: 64.120938, lng: 32.410536, name: 'Гараж', type: 'место', photo: '-', photoCaption: '-', etymology: 'Территория бывшего гаража Тикшинского леспромхоза' },
   { id: '44', lat: 64.077191, lng: 32.782339, name: 'Посёлок Южный', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '45', lat: 64.085439, lng: 32.787940, name: 'Калливо-гора', type: 'гора', photo: 'photo_jpg/kalivo.jpg', photoCaption: 'Фотография автора проекта.', etymology: '-' },
+  { id: '45', lat: 64.085439, lng: 32.787940, name: 'Калливо-гора', type: 'гора', photo: 'photo_jpg/kalivo.jpg', photoCaption: 'Фотография автора проекта', etymology: '-' },
   { id: '46', lat: 64.076243, lng: 32.767552, name: 'Керушниеми', type: 'мыс', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '47', lat: 64.076184, lng: 32.773296, name: 'Мининская горка', type: 'гора', photo: 'photo_jpg/minin.jpg', photoCaption: 'Фотография автора проекта.', etymology: '-' },
+  { id: '47', lat: 64.076184, lng: 32.773296, name: 'Мининская горка', type: 'гора', photo: 'photo_jpg/minin.jpg', photoCaption: 'Фотография автора проекта', etymology: '-' },
   { id: '48', lat: 64.093609, lng: 32.916276, name: 'Варламовская дорога', type: 'дорога', photo: '-', photoCaption: '-', etymology: 'Дорога к месту гибели Героя СССР Николая Гавриловича Варламова' },
-  { id: '49', lat: 64.111889, lng: 32.575730, name: 'Пизьма', type: 'водоём', photo: '-', photoCaption: '-', etymology: '-' },
+  { id: '49', lat: 64.111889, lng: 32.575730, name: 'Пизьма', type: 'водоём'},
   { id: '56', lat: 64.119872, lng: 32.407461, name: 'Газочурка', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '61', lat: 64.127828, lng: 32.393138, name: 'Вторая ламбина - Тикша', type: 'водоём', photo: '-', photoCaption: '-', etymology: '-' },
+  { id: '61', lat: 64.127828, lng: 32.393138, name: 'Вторая ламбина', type: 'водоём', photo: '-', photoCaption: '-', etymology: '-' },
   { id: '63', lat: 63.981656, lng: 31.815911, name: 'Перемычка', type: 'дорога', photo: '-', photoCaption: '-', etymology: '-' },
-  { id: '67', lat: 64.087584, lng: 32.783793, name: 'Каменный мост/пирс', type: 'место', photo: 'photo_jpg/kivimost.jpg', photoCaption: 'Фотография автора проекта.', etymology: '-' },
-  { id: '68', lat: 64.102155, lng: 32.819288, name: 'Пушка', type: 'место', photo: 'photo_jpg/pushka.jpg', photoCaption: 'Фотография автора проекта.', etymology: '-' },
-  { id: '69', lat: 64.089310, lng: 32.789731, name: 'Старое кладбище', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
+  { id: '67', lat: 64.087584, lng: 32.783793, name: 'Каменный мост', type: 'место', photo: 'photo_jpg/kivimost.jpg', photoCaption: 'Фотография автора проекта', etymology: 'Пожарный пирс на берегу озера Ругозеро, сделанный из каменной насыпи' },
+  { id: '68', lat: 64.102155, lng: 32.819288, name: 'Пушка', type: 'место', photo: 'photo_jpg/pushka.jpg', photoCaption: 'Фотография автора проекта', etymology: 'Пушка - народное название памятного знака, установленного 25.06.1969 в честь 25-й годовщины освобождения Карелии от немецко-финских войск.' },
+  { id: '69', lat: 64.089310, lng: 32.789731, name: 'Старое кладбище', type: 'место'},
   { id: '74', lat: 64.077000, lng: 32.769302, name: 'Лягушатник', type: 'водоём', photo: 'photo_jpg/skokuna.jpg', photoCaption: 'Фотографи автора проекта', etymology: '-' },
-  { id: '75', lat: 64.081044, lng: 32.779349, name: 'Днд', type: 'место', photo: '-', photoCaption: '-', etymology: '-' },
+  { id: '75', lat: 64.081044, lng: 32.779349, name: 'Днд', type: 'место'},
   { id: '77', lat: 63.993560, lng: 32.844725, name: 'Пойдома', type: 'водоём', photo: 'photo_jpg/poidoma.jpg', photoCaption: 'Фотография автора проекта.', etymology: '-' },
 ];
 
@@ -856,25 +859,23 @@
                 sidebarInfoCard.classList.add('sidebar__info-card--visible');
                 placeNameEl.textContent = place.name;
 
-// Определяем наличие данных
 const hasPhoto = place.photo && place.photo !== '-' && place.photo.trim() !== '';
 const hasEtymology = place.etymology && place.etymology !== '-' && place.etymology.trim() !== '';
 const hasPhotoCaption = place.photoCaption && place.photoCaption.trim() !== '';
 
-// Если нет ни фото, ни подписи, ни этимологии – показываем сообщение
 if (!hasPhoto && !hasEtymology && !hasPhotoCaption) {
-    // Скрываем все информационные блоки
+
     document.querySelector('.sidebar__photo-wrapper').style.display = 'none';
     document.getElementById('placePhotoCaption').style.display = 'none';
     document.querySelector('.sidebar__etymology').style.display = 'none';
-    // Показываем сообщение
+
     placeNoInfoEl.style.display = 'block';
     placeNoInfoEl.textContent = 'Пока информация об этом названии отсутствует.';
 } else {
-    // Скрываем сообщение
+
     placeNoInfoEl.style.display = 'none';
 
-    // Фото и подпись
+
     const photoWrapper = document.querySelector('.sidebar__photo-wrapper');
     const photoCaption = document.getElementById('placePhotoCaption');
     if (hasPhoto) {
@@ -891,7 +892,6 @@ if (!hasPhoto && !hasEtymology && !hasPhotoCaption) {
         placePhotoCaptionEl.textContent = '';
     }
 
-    // Этимология
     const etymologyBlock = document.querySelector('.sidebar__etymology');
     if (hasEtymology) {
         etymologyBlock.style.display = 'block';
@@ -901,7 +901,6 @@ if (!hasPhoto && !hasEtymology && !hasPhotoCaption) {
         placeEtymologyEl.textContent = '';
     }
 }
-                // Подпись к фото
                 placePhotoCaptionEl.textContent = place.photoCaption || '';
 
                 const etymologyContainer = document.querySelector('.sidebar__etymology');
@@ -929,12 +928,12 @@ if (!hasPhoto && !hasEtymology && !hasPhotoCaption) {
                 sidebarPlaceholder.style.display = '';
                 sidebarInfoCard.classList.remove('sidebar__info-card--visible');
                 placeNameEl.textContent = '';
-                // Восстанавливаем видимость всех блоков
+
                 document.querySelector('.sidebar__photo-wrapper').style.display = 'block';
                 document.getElementById('placePhotoCaption').style.display = 'block';
                 document.querySelector('.sidebar__etymology').style.display = 'block';
                 placeNoInfoEl.style.display = 'none';
-                // Очищаем тексты
+
                 placePhotoEl.src = '';
                 placePhotoEl.alt = 'Фотография места';
                 placePhotoCaptionEl.textContent = '';
