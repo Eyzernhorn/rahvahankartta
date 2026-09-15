@@ -411,7 +411,59 @@
             letter-spacing: 0.01em;
         }
 
-        /* ===== МОДАЛЬНОЕ ОКНО ДЛЯ ФОТО ===== */
+.news-block {
+    margin-top: 40px;
+    padding: 24px 28px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+}
+
+.news-block__heading {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    letter-spacing: 0.02em;
+}
+
+.news-block__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.news-block__item {
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-light);
+}
+.news-block__item:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.news-block__date {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--accent-blue-hover);
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.news-block__text {
+    font-size: 0.98rem;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    margin: 0;
+    letter-spacing: 0.01em;
+}
+
         .photo-modal {
             display: none;
             position: fixed;
@@ -652,6 +704,19 @@
                     <p class="page__text">
                     Автор проекта выражает огромную благодарность всем, кто поделился информацией о микротопонимах.
                 </p>
+                <div class="news-block">
+    <h2 class="news-block__heading">Новости проекта</h2>
+    <ul class="news-block__list">
+        <li class="news-block__item">
+            <span class="news-block__date">31 августа 2026</span>
+            <p class="news-block__text">Запущен сайт проекта.</p>
+        </li>
+        <li class="news-block__item">
+            <span class="news-block__date">21 мая 2026</span>
+            <p class="news-block__text">Проект впервые представлен на Ярмарке этнопроектов в рамках Петербургского Этнофорума.</p>
+        </li>
+    </ul>
+</div>
             </div>
         </div>
 
