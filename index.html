@@ -606,6 +606,42 @@
                 aspect-ratio: 16 / 7;
                 max-height: 130px;
             }
+            /* ===== АДАПТАЦИЯ ШАПКИ ДЛЯ ТЕЛЕФОНОВ ===== */
+@media (max-width: 600px) {
+    body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .header {
+        height: auto;
+        flex-wrap: wrap;
+        padding: 8px 10px;
+        gap: 4px;
+    }
+
+    .header__title {
+        font-size: 1.1rem;
+        flex: 1 1 auto;
+    }
+
+    .header__nav {
+        flex: 1 1 100%;
+        flex-wrap: wrap;
+        gap: 2px;
+    }
+
+    .header__tab {
+        padding: 6px 9px;
+        font-size: 0.78rem;
+    }
+
+    .main {
+        height: auto;
+        flex: 1;
+        min-height: 0;
+    }
+}
         }
     </style>
 </head>
