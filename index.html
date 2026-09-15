@@ -906,7 +906,7 @@
                     popupAnchor: [0, -25],
                 });
 
-                const marker = L.marker([place.lat, place.lng], { icon: icon });
+                const marker = L.marker([place.lat, place.lng], { icon: icon, keyboard: false });
                 marker.addTo(map);
 
                 marker.bindTooltip(place.name, {
@@ -946,6 +946,7 @@
             });
 
             function selectPlace(place, marker) {
+                 window.scrollTo(0, 0);
                 markersArray.forEach(m => {
                     m.getElement()?.classList.remove('marker-active');
                     m.getElement()?.classList.remove('marker-hover');
