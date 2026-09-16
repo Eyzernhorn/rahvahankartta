@@ -606,42 +606,6 @@
                 aspect-ratio: 16 / 7;
                 max-height: 130px;
             }
-            /* ===== АДАПТАЦИЯ ШАПКИ ДЛЯ ТЕЛЕФОНОВ ===== */
-@media (max-width: 600px) {
-    body {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .header {
-        height: auto;
-        flex-wrap: wrap;
-        padding: 8px 10px;
-        gap: 4px;
-    }
-
-    .header__title {
-        font-size: 1.1rem;
-        flex: 1 1 auto;
-    }
-
-    .header__nav {
-        flex: 1 1 100%;
-        flex-wrap: wrap;
-        gap: 2px;
-    }
-
-    .header__tab {
-        padding: 6px 9px;
-        font-size: 0.78rem;
-    }
-
-    .main {
-        height: auto;
-        flex: 1;
-        min-height: 0;
-    }
-}
         }
     </style>
 </head>
@@ -765,16 +729,6 @@
     </script>
     <script>
         (function() {
-    if (window.self !== window.top) {
-        document.body.style.overflow = 'hidden';
-
-        Element.prototype.scrollIntoView = function() {};
-
-        const originalFocus = HTMLElement.prototype.focus;
-        HTMLElement.prototype.focus = function(options) {
-            return originalFocus.call(this, { preventScroll: true });
-        };
-    }  {
              const placesData = [
   { id: '1', lat: 64.110361, lng: 32.398475, name: 'Остров', type: 'остров', photo: 'photo_jpg/ostrov.jpg', photoCaption: 'Вид с острова на озеро Новинка. Фотография автора проекта', etymology: '-' },
   { id: '2', lat: 64.109325, lng: 32.372066, name: 'Пятая биржа', type: 'место'},
@@ -916,7 +870,7 @@
                     popupAnchor: [0, -25],
                 });
 
-                const marker = L.marker([place.lat, place.lng], { icon: icon, keyboard: false });
+                const marker = L.marker([place.lat, place.lng], { icon: icon });
                 marker.addTo(map);
 
                 marker.bindTooltip(place.name, {
@@ -956,7 +910,6 @@
             });
 
             function selectPlace(place, marker) {
-                 window.scrollTo(0, 0);
                 markersArray.forEach(m => {
                     m.getElement()?.classList.remove('marker-active');
                     m.getElement()?.classList.remove('marker-hover');
