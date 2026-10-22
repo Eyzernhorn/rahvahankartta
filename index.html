@@ -262,6 +262,35 @@
             color: #6b8a9e;
         }
 
+        .sidebar__meta {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sidebar__meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 6px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+.sidebar__meta-label {
+    color: #6b8a9e;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.sidebar__meta-value {
+    color: var(--text-secondary);
+    letter-spacing: 0.01em;
+}
+        
         .sidebar__no-info {
             font-size: 0.95rem;
             color: var(--text-muted);
@@ -679,6 +708,15 @@
                         <span class="sidebar__etymology-label">Почему так названо</span>
                         <span id="placeEtymology"></span>
                     </div>
+                    <div class="sidebar__meta" id="placeMeta" style="display: none;">
+                    <div class="sidebar__meta-row" id="placeDateRow">
+                        <span class="sidebar__meta-label">Дата возникновения:</span>
+                        <span class="sidebar__meta-value" id="placeDate"></span>
+                    </div>
+        <div class="sidebar__meta-row" id="placeInformantRow">
+            <span class="sidebar__meta-label">Информант:</span>
+            <span class="sidebar__meta-value" id="placeInformant"></span>
+        </div>
                     </div>
                 </div>
             </aside>
@@ -870,7 +908,11 @@
             const placePhotoCaptionEl = document.getElementById('placePhotoCaption');
             const placeEtymologyEl = document.getElementById('placeEtymology');
             const placeNoInfoEl = document.getElementById('placeNoInfo');
-
+            const placeMetaEl = document.getElementById('placeMeta');
+            const placeDateRow = document.getElementById('placeDateRow');
+            const placeDateEl = document.getElementById('placeDate');
+            const placeInformantRow = document.getElementById('placeInformantRow');
+            const placeInformantEl = document.getElementById('placeInformant');
             const photoModal = document.getElementById('photoModal');
             const photoModalImage = document.getElementById('photoModalImage');
             const photoModalCaption = document.getElementById('photoModalCaption');
@@ -972,28 +1014,31 @@
                 sidebarInfoCard.classList.add('sidebar__info-card--visible');
                 placeNameEl.textContent = place.name;
 
+// Определяем наличие данных
 const hasPhoto = place.photo && place.photo !== '-' && place.photo.trim() !== '';
-const hasEtymology = place.etymology && place.etymology !== '-' && place.etymology.trim() !== '';
 const hasPhotoCaption = place.photoCaption && place.photoCaption.trim() !== '';
+const hasEtymology = place.etymology && place.etymology !== '-' && place.etymology.trim() !== '';
+const hasDate = place.date && place.date !== '-' && place.date.trim() !== '';
+const hasInformant = place.informant && place.informant !== '-' && place.informant.trim() !== '';
+const hasAnyInfo = hasPhoto || hasPhotoCaption || hasEtymology || hasDate || hasInformant;
 
-if (!hasPhoto && !hasEtymology && !hasPhotoCaption) {
-
+if (!hasAnyInfo) {
+    // Нет никакой информации, кроме названия
     document.querySelector('.sidebar__photo-wrapper').style.display = 'none';
     document.getElementById('placePhotoCaption').style.display = 'none';
     document.querySelector('.sidebar__etymology').style.display = 'none';
-
+    placeMetaEl.style.display = 'none';
     placeNoInfoEl.style.display = 'block';
     placeNoInfoEl.textContent = 'Пока информация об этом названии отсутствует.';
 } else {
-
     placeNoInfoEl.style.display = 'none';
 
-
+    // ----- Фото и подпись -----
     const photoWrapper = document.querySelector('.sidebar__photo-wrapper');
     const photoCaption = document.getElementById('placePhotoCaption');
     if (hasPhoto) {
         photoWrapper.style.display = 'block';
-        photoCaption.style.display = 'block';
+        photoCaption.style.display = hasPhotoCaption ? 'block' : 'none';
         placePhotoEl.src = place.photo;
         placePhotoEl.alt = 'Фотография: ' + place.name;
         placePhotoCaptionEl.textContent = place.photoCaption || '';
@@ -1005,6 +1050,7 @@ if (!hasPhoto && !hasEtymology && !hasPhotoCaption) {
         placePhotoCaptionEl.textContent = '';
     }
 
+    // ----- Этимология -----
     const etymologyBlock = document.querySelector('.sidebar__etymology');
     if (hasEtymology) {
         etymologyBlock.style.display = 'block';
@@ -1012,6 +1058,31 @@ if (!hasPhoto && !hasEtymology && !hasPhotoCaption) {
     } else {
         etymologyBlock.style.display = 'none';
         placeEtymologyEl.textContent = '';
+    }
+
+    // ----- Дата и информант -----
+    if (hasDate || hasInformant) {
+        placeMetaEl.style.display = 'flex';
+
+        if (hasDate) {
+            placeDateRow.style.display = 'flex';
+            placeDateEl.textContent = place.date;
+        } else {
+            placeDateRow.style.display = 'none';
+            placeDateEl.textContent = '';
+        }
+
+        if (hasInformant) {
+            placeInformantRow.style.display = 'flex';
+            placeInformantEl.textContent = place.informant;
+        } else {
+            placeInformantRow.style.display = 'none';
+            placeInformantEl.textContent = '';
+        }
+    } else {
+        placeMetaEl.style.display = 'none';
+        placeDateEl.textContent = '';
+        placeInformantEl.textContent = '';
     }
 }
                 placePhotoCaptionEl.textContent = place.photoCaption || '';
@@ -1033,25 +1104,28 @@ if (!hasPhoto && !hasEtymology && !hasPhotoCaption) {
             }
 
             function resetSidebar() {
-                activeMarkerDataId = null;
-                markersArray.forEach(m => {
-                    m.getElement()?.classList.remove('marker-active');
-                    m.getElement()?.classList.remove('marker-hover');
-                });
-                sidebarPlaceholder.style.display = '';
-                sidebarInfoCard.classList.remove('sidebar__info-card--visible');
-                placeNameEl.textContent = '';
+    activeMarkerDataId = null;
+    markersArray.forEach(function (item) {
+        item.element.classList.remove('marker-active');
+        item.element.classList.remove('marker-hover');
+    });
+    sidebarPlaceholder.style.display = '';
+    sidebarInfoCard.classList.remove('sidebar__info-card--visible');
+    placeNameEl.textContent = '';
+    placeNoInfoEl.style.display = 'none';
+    placePhotoEl.src = '';
+    placePhotoEl.alt = 'Фотография места';
+    placePhotoCaptionEl.textContent = '';
+    placeEtymologyEl.textContent = '';
+    placeDateEl.textContent = '';
+    placeInformantEl.textContent = '';
 
-                document.querySelector('.sidebar__photo-wrapper').style.display = 'block';
-                document.getElementById('placePhotoCaption').style.display = 'block';
-                document.querySelector('.sidebar__etymology').style.display = 'block';
-                placeNoInfoEl.style.display = 'none';
-
-                placePhotoEl.src = '';
-                placePhotoEl.alt = 'Фотография места';
-                placePhotoCaptionEl.textContent = '';
-                placeEtymologyEl.textContent = '';
-            }
+    // Восстанавливаем видимость блоков
+    document.querySelector('.sidebar__photo-wrapper').style.display = 'block';
+    document.getElementById('placePhotoCaption').style.display = 'block';
+    document.querySelector('.sidebar__etymology').style.display = 'block';
+    placeMetaEl.style.display = 'none';
+}
 
             function openPhotoModal(photoUrl, caption) {
                 if (!photoUrl || photoUrl === '-' || photoUrl === '') return;
