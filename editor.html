@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Редактор топонимов — Rahvahan kartta</title>
+<style>
+    :root {
+        --bg-body: #f7f4f0;
+        --bg-header: #ece7e0;
+        --bg-sidebar: #faf8f5;
+        --bg-card: #ffffff;
+        --text-primary: #3d3d3d;
+        --text-secondary: #5c5c5c;
+        --text-muted: #7a7a7a;
+        --accent-blue: #8ba7b8;
+        --accent-blue-hover: #7a96a7;
+        --border-light: #ddd8d1;
+        --shadow-soft: 0 2px 12px rgba(60, 50, 40, 0.08);
+        --shadow-card: 0 4px 20px rgba(60, 50, 40, 0.10);
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --font-heading: 'Georgia', 'Times New Roman', serif;
+        --font-body: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+        height: 100%;
+        font-family: var(--font-body);
+        background: var(--bg-body);
+        color: var(--text-primary);
+        font-size: 15px;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    body { display: flex; flex-direction: column; overflow: hidden; }
+
+    /* ===== ВЕРХНЯЯ ПАНЕЛЬ ===== */
+    .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        padding: 12px 24px;
+        background: var(--bg-header);
+        border-bottom: 1px solid var(--border-light);
+        flex-shrink: 0;
+    }
+
+    .topbar h1 {
+        font-family: var(--font-heading);
+        font-weight: 400;
+        font-size: 1.3rem;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+    }
+    .topbar h1 span {
+        font-family: var(--font-body);
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-left: 10px;
+        letter-spacing: 0.03em;
+    }
+
+    .topbar__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* ===== КНОПКИ ===== */
+    .btn {
+        padding: 8px 16px;
+        font-family: var(--font-body);
+        font-size: 0.87rem;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        border-radius: var(--radius-sm);
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .btn--primary {
+        background: var(--accent-blue);
+        color: #fff;
+        border-color: var(--accent-blue);
+    }
+    .btn--primary:hover { background: var(--accent-blue-hover); border-color: var(--accent-blue-hover); }
+    .btn--ghost {
+        background: transparent;
+        color: var(--text-secondary);
+        border-color: var(--border-light);
+    }
+    .btn--ghost:hover { background: rgba(139,167,184,0.12); border-color: var(--accent-blue); color: var(--accent-blue-hover); }
+    .btn--danger {
+        background: transparent;
+        color: #b06a5a;
+        border-color: #e0c8c0;
+    }
+    .btn--danger:hover { background: rgba(176,106,90,0.08); border-color: #b06a5a; }
+    .btn--block { width: 100%; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ===== МАКЕТ ===== */
+    .layout { flex: 1; display: flex; min-height: 0; }
+
+    /* ===== СПИСОК ===== */
+    .panel--list {
+        width: 350px;
+        flex-shrink: 0;
+        background: var(--bg-sidebar);
+        border-right: 1px solid var(--border-light);
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .list-head {
+        padding: 16px;
+        border-bottom: 1px solid var(--border-light);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .search-input, .form-grid input, .form-grid select, .form-grid textarea {
+        width: 100%;
+        padding: 8px 12px;
+        font-family: var(--font-body);
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        background: #fff;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-sm);
+        outline: none;
+        transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .search-input:focus, .form-grid input:focus, .form-grid select:focus, .form-grid textarea:focus {
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 0 3px rgba(139,167,184,0.18);
+    }
+
+    .place-list {
+        list-style: none;
+        overflow-y: auto;
+        flex: 1;
+        padding: 6px 0;
+    }
+
+    .place-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 16px;
+        cursor: pointer;
+        border-left: 3px solid transparent;
+        transition: background 0.14s ease;
+        font-size: 0.9rem;
+    }
+    .place-item:hover { background: rgba(139,167,184,0.12); }
+    .place-item--active {
+        background: rgba(139,167,184,0.2);
+        border-left-color: var(--accent-blue);
+    }
+    .place-item__icon { font-size: 1.1rem; flex-shrink: 0; width: 22px; text-align: center; }
+    .place-item__name {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: var(--text-primary);
+    }
+    .place-item__type {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        flex-shrink: 0;
+    }
+
+    .place-list__empty {
+        padding: 24px 16px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.87rem;
+        font-style: italic;
+        line-height: 1.6;
+    }
+
+    .list-foot {
+        padding: 10px 16px;
+        border-top: 1px solid var(--border-light);
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        letter-spacing: 0.02em;
+        flex-shrink: 0;
+    }
+
+    /* ===== ФОРМА ===== */
+    .panel--form {
+        flex: 1;
+        overflow-y: auto;
+        padding: 28px 32px 60px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        max-width: 780px;
+    }
+
+    .form-grid label {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        letter-spacing: 0.02em;
+    }
+    .form-grid label.span2 { grid-column: span 2; }
+
+    .form-grid input, .form-grid select, .form-grid textarea {
+        font-size: 0.93rem;
+        color: var(--text-primary);
+    }
+    .form-grid textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
+    .form-grid input[readonly] { background: #f0ece6; color: var(--text-muted); cursor: default; }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 24px;
+        max-width: 780px;
+    }
+
+    .hint {
+        margin-top: 14px;
+        font-size: 0.85rem;
+        color: var(--accent-blue-hover);
+        min-height: 20px;
+        letter-spacing: 0.01em;
+    }
+    .hint--error { color: #b06a5a; }
+
+    /* ===== МОДАЛКА ===== */
+    .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(30, 26, 22, 0.6);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+    .modal--open { display: flex; }
+
+    .modal__box {
+        background: #fff;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-card);
+        width: 100%;
+        max-width: 900px;
+        max-height: 88vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .modal__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 22px;
+        border-bottom: 1px solid var(--border-light);
+    }
+    .modal__head h2 {
+        font-family: var(--font-heading);
+        font-weight: 400;
+        font-size: 1.1rem;
+    }
+
+    .modal__close {
+        background: none;
+        border: none;
+        font-size: 26px;
+        line-height: 1;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 0 4px;
+    }
+    .modal__close:hover { color: var(--text-primary); }
+
+    .code-area {
+        flex: 1;
+        width: 100%;
+        border: none;
+        outline: none;
+        padding: 18px 22px;
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        font-size: 0.84rem;
+        line-height: 1.6;
+        color: #3d3d3d;
+        background: #fbfaf8;
+        resize: none;
+        min-height: 300px;
+    }
+
+    .modal__foot {
+        padding: 14px 22px;
+        border-top: 1px solid var(--border-light);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    /* ===== СКРОЛЛБАРЫ ===== */
+    .place-list::-webkit-scrollbar,
+    .panel--form::-webkit-scrollbar { width: 7px; }
+    .place-list::-webkit-scrollbar-thumb,
+    .panel--form::-webkit-scrollbar-thumb { background: #cbc4bb; border-radius: 20px; }
+    .place-list::-webkit-scrollbar-track,
+    .panel--form::-webkit-scrollbar-track { background: transparent; }
+
+    /* ===== АДАПТАЦИЯ ===== */
+    @media (max-width: 860px) {
+        .layout { flex-direction: column; }
+        .panel--list {
+            width: 100%;
+            max-height: 45vh;
+            border-right: none;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .form-grid { grid-template-columns: 1fr; }
+        .form-grid label.span2 { grid-column: span 1; }
+        .panel--form { padding: 20px 18px 50px; }
+    }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+    <h1>Редактор топонимов<span>Rahvahan kartta</span></h1>
+    <div class="topbar__actions">
+        <label class="btn btn--ghost">
+            Загрузить places.js
+            <input type="file" id="fileInput" accept=".js,.txt" hidden>
+        </label>
+        <button class="btn btn--ghost" id="showCodeBtn">Показать код</button>
+        <button class="btn btn--primary" id="exportBtn">Скачать places.js</button>
+    </div>
+</header>
+
+<main class="layout">
+
+    <!-- СПИСОК -->
+    <aside class="panel--list">
+        <div class="list-head">
+            <input type="search" class="search-input" id="searchInput" placeholder="Поиск по названию или типу...">
+            <button class="btn btn--primary btn--block" id="newBtn">+ Новый топоним</button>
+        </div>
+        <ul class="place-list" id="placeList"></ul>
+        <div class="list-foot" id="listFoot"></div>
+    </aside>
+
+    <!-- ФОРМА -->
+    <section class="panel--form">
+        <form id="placeForm" autocomplete="off">
+            <div class="form-grid">
+                <label>
+                    ID
+                    <input name="id" id="f-id" readonly title="Генерируется автоматически">
+                </label>
+                <label>
+                    Тип
+                    <select name="type" id="f-type">
+                        <option value="место">Место</option>
+                        <option value="водоём">Водоём</option>
+                        <option value="река">Река</option>
+                        <option value="гора">Гора</option>
+                        <option value="мыс">Мыс</option>
+                        <option value="порог">Порог</option>
+                        <option value="болото">Болото</option>
+                        <option value="остров">Остров</option>
+                        <option value="лес">Лес</option>
+                        <option value="дорога">Дорога</option>
+                        <option value="источник">Источник</option>
+                        <option value="район">Район</option>
+                        <option value="урочище">Урочище</option>
+                        <option value="достопримечательность">Достопримечательность</option>
+                        <option value="здание">Здание</option>
+                    </select>
+                </label>
+
+                <label class="span2">
+                    Название *
+                    <input name="name" id="f-name" placeholder="Например: Хутка" required>
+                </label>
+
+                <label>
+                    Широта (lat) *
+                    <input name="lat" id="f-lat" type="number" step="any" placeholder="64.119892" required>
+                </label>
+                <label>
+                    Долгота (lng) *
+                    <input name="lng" id="f-lng" type="number" step="any" placeholder="32.397562" required>
+                </label>
+
+                <label>
+                    Подтип
+                    <input name="subtype" id="f-subtype" placeholder="ламбина, возвышенность...">
+                </label>
+                <label>
+                    Дата возникновения
+                    <input name="date" id="f-date" placeholder="80-е годы XX века">
+                </label>
+
+                <label class="span2">
+                    Фото — путь или URL
+                    <input name="photo" id="f-photo" placeholder="photo_jpg/file.jpg">
+                </label>
+                <label class="span2">
+                    Подпись к фото
+                    <input name="photoCaption" id="f-photoCaption" placeholder="Фотография автора проекта">
+                </label>
+
+                <label class="span2">
+                    Этимология — почему так названо
+                    <textarea name="etymology" id="f-etymology" rows="3"
+                        placeholder="Происхождение названия, его история..."></textarea>
+                </label>
+
+                <label class="span2">
+                    Информант — источник информации
+                    <input name="informant" id="f-informant" placeholder="Имя, населённый пункт">
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn--primary" id="saveBtn">Сохранить</button>
+                <button type="button" class="btn btn--ghost" id="dupBtn">Дублировать</button>
+                <button type="button" class="btn btn--danger" id="deleteBtn" disabled>Удалить</button>
+                <button type="button" class="btn btn--ghost" id="clearBtn">Очистить форму</button>
+            </div>
+
+            <p class="hint" id="hint"></p>
+        </form>
+    </section>
+
+</main>
+
+<!-- МОДАЛКА С КОДОМ -->
+<div class="modal" id="codeModal">
+    <div class="modal__box">
+        <div class="modal__head">
+            <h2>places.js</h2>
+            <button class="modal__close" id="codeModalClose" aria-label="Закрыть">&times;</button>
+        </div>
+        <textarea class="code-area" id="codeArea" readonly spellcheck="false"></textarea>
+        <div class="modal__foot">
+            <button class="btn btn--ghost" id="downloadFromModal">Скачать файл</button>
+            <button class="btn btn--primary" id="copyBtn">Скопировать</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    // ===== СПРАВОЧНИКИ =====
+    const TYPE_ICONS = {
+        водоём: '🌅', река: '🛶', лес: '🌲', гора: '⛰️', дорога: '🛣️',
+        болото: '🌿', остров: '🏞️', порог: '🌊', мыс: '🪨', источник: '💧',
+        место: '📍', район: '🧭', урочище: '🏘️', достопримечательность: '📸',
+        здание: '🏠'
+    };
+
+    const STORAGE_KEY = 'rahvahan_places_v1';
+
+    // ===== СОСТОЯНИЕ =====
+    let places = [];          // полный список, порядок сохраняется
+    let editingId = null;     // id редактируемого топонима (null — создаём новый)
+    let searchQuery = '';
+
+    // ===== DOM =====
+    const form = document.getElementById('placeForm');
+    const f = {
+        id: document.getElementById('f-id'),
+        type: document.getElementById('f-type'),
+        name: document.getElementById('f-name'),
+        lat: document.getElementById('f-lat'),
+        lng: document.getElementById('f-lng'),
+        subtype: document.getElementById('f-subtype'),
+        date: document.getElementById('f-date'),
+        photo: document.getElementById('f-photo'),
+        photoCaption: document.getElementById('f-photoCaption'),
+        etymology: document.getElementById('f-etymology'),
+        informant: document.getElementById('f-informant')
+    };
+
+    const placeListEl = document.getElementById('placeList');
+    const listFootEl = document.getElementById('listFoot');
+    const searchInput = document.getElementById('searchInput');
+    const hintEl = document.getElementById('hint');
+    const saveBtn = document.getElementById('saveBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+
+    const codeModal = document.getElementById('codeModal');
+    const codeArea = document.getElementById('codeArea');
+
+    // ===== УТИЛИТЫ =====
+    function esc(str) {
+        return String(str)
+            .replace(/\\/g, '\\\\')
+            .replace(/'/g, "\\'")
+            .replace(/\r?\n/g, '\\n');
+    }
+
+    function showHint(msg, isError) {
+        hintEl.textContent = msg || '';
+        hintEl.classList.toggle('hint--error', !!isError);
+        if (msg) {
+            clearTimeout(showHint._t);
+            showHint._t = setTimeout(function () {
+                hintEl.textContent = '';
+                hintEl.classList.remove('hint--error');
+            }, 3200);
+        }
+    }
+
+    function nextId() {
+        let max = 0;
+        places.forEach(function (p) {
+            const n = parseInt(p.id, 10);
+            if (!isNaN(n) && n > max) max = n;
+        });
+        return String(max + 1);
+    }
+
+    // ===== СЕРИАЛИЗАЦИЯ В КОД =====
+    function placeToLine(p) {
+        const parts = [];
+        parts.push("id: '" + esc(p.id) + "'");
+        parts.push('lat: ' + Number(p.lat));
+        parts.push('lng: ' + Number(p.lng));
+        parts.push("name: '" + esc(p.name) + "'");
+
+        if (p.type) parts.push("type: '" + esc(p.type) + "'");
+        if (p.subtype) parts.push("subtype: '" + esc(p.subtype) + "'");
+        if (p.photo) parts.push("photo: '" + esc(p.photo) + "'");
+        if (p.photoCaption) parts.push("photoCaption: '" + esc(p.photoCaption) + "'");
+        if (p.etymology) parts.push("etymology: '" + esc(p.etymology) + "'");
+        if (p.date) parts.push("date: '" + esc(p.date) + "'");
+        if (p.informant) parts.push("informant: '" + esc(p.informant) + "'");
+
+        return '  { ' + parts.join(', ') + ' }';
+    }
+
+    function buildFileContent() {
+        if (!places.length) {
+            return 'window.placesData = [];\n';
+        }
+        return 'window.placesData = [\n'
+            + places.map(placeToLine).join(',\n')
+            + '\n];\n';
+    }
+
+    // ===== ПАРСИНГ ФАЙЛА =====
+    function parsePlacesFile(text) {
+        const start = text.indexOf('[');
+        if (start === -1) throw new Error('В файле не найден массив данных');
+
+        let depth = 0;
+        let end = -1;
+        let inStr = false;
+        let quote = '';
+        let escape = false;
+
+        for (let i = start; i < text.length; i++) {
+            const ch = text[i];
+
+            if (escape) { escape = false; continue; }
+
+            if (inStr) {
+                if (ch === '\\') { escape = true; continue; }
+                if (ch === quote) inStr = false;
+                continue;
+            }
+
+            if (ch === '"' || ch === "'" || ch === '`') {
+                inStr = true;
+                quote = ch;
+                continue;
+            }
+
+            if (ch === '[') depth++;
+            else if (ch === ']') {
+                depth--;
+                if (depth === 0) { end = i; break; }
+            }
+        }
+
+        if (end === -1) throw new Error('Не удалось найти конец массива');
+
+        const arrText = text.slice(start, end + 1);
+        const data = new Function('return ' + arrText)();
+
+        if (!Array.isArray(data)) throw new Error('Данные не являются массивом');
+        return data;
+    }
+
+    // ===== СОХРАНЕНИЕ / ЗАГРУЗКА =====
+    function persist() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(places));
+        } catch (e) {
+            console.warn('Не удалось сохранить в localStorage', e);
+        }
+    }
+
+    function restore() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                const data = JSON.parse(raw);
+                if (Array.isArray(data)) places = data;
+            }
+        } catch (e) {
+            console.warn('Не удалось прочитать localStorage', e);
+        }
+    }
+
+    // ===== РЕНДЕР СПИСКА =====
+    function renderList() {
+        const q = searchQuery.trim().toLowerCase();
+
+        const visible = places.filter(function (p) {
+            if (!q) return true;
+            return String(p.name || '').toLowerCase().includes(q)
+                || String(p.type || '').toLowerCase().includes(q)
+                || String(p.subtype || '').toLowerCase().includes(q);
+        });
+
+        // Сортировка только для отображения
+        const sorted = visible.slice().sort(function (a, b) {
+            return String(a.name || '').localeCompare(String(b.name || ''), 'ru');
+        });
+
+        placeListEl.innerHTML = '';
+
+        if (!sorted.length) {
+            const li = document.createElement('li');
+            li.className = 'place-list__empty';
+            li.textContent = places.length
+                ? 'Ничего не найдено по запросу.'
+                : 'Список пуст. Загрузите places.js или создайте первый топоним.';
+            placeListEl.appendChild(li);
+        } else {
+            sorted.forEach(function (p) {
+                const li = document.createElement('li');
+                li.className = 'place-item' + (p.id === editingId ? ' place-item--active' : '');
+                li.dataset.id = p.id;
+
+                const icon = document.createElement('span');
+                icon.className = 'place-item__icon';
+                icon.textContent = TYPE_ICONS[p.type] || '📍';
+
+                const name = document.createElement('span');
+                name.className = 'place-item__name';
+                name.textContent = p.name || '(без названия)';
+
+                const type = document.createElement('span');
+                type.className = 'place-item__type';
+                type.textContent = p.type || '';
+
+                li.appendChild(icon);
+                li.appendChild(name);
+                li.appendChild(type);
+
+                li.addEventListener('click', function () {
+                    startEdit(p.id);
+                });
+
+                placeListEl.appendChild(li);
+            });
+        }
+
+        listFootEl.textContent = 'Всего: ' + places.length
+            + (q ? ' · Найдено: ' + sorted.length : '');
+    }
+
+    // ===== ЗАПОЛНЕНИЕ ФОРМЫ =====
+    function fillForm(p) {
+        f.id.value = p.id || '';
+        f.type.value = p.type || 'место';
+        f.name.value = p.name || '';
+        f.lat.value = (p.lat !== undefined && p.lat !== null) ? p.lat : '';
+        f.lng.value = (p.lng !== undefined && p.lng !== null) ? p.lng : '';
+        f.subtype.value = p.subtype || '';
+        f.date.value = p.date || '';
+        f.photo.value = p.photo || '';
+        f.photoCaption.value = p.photoCaption || '';
+        f.etymology.value = p.etymology || '';
+        f.informant.value = p.informant || '';
+
+        deleteBtn.disabled = !p.id;
+        saveBtn.textContent = p.id ? 'Сохранить изменения' : 'Добавить топоним';
+    }
+
+    function clearForm() {
+        editingId = null;
+        f.id.value = nextId();
+        f.type.value = 'место';
+        f.name.value = '';
+        f.lat.value = '';
+        f.lng.value = '';
+        f.subtype.value = '';
+        f.date.value = '';
+        f.photo.value = '';
+        f.photoCaption.value = '';
+        f.etymology.value = '';
+        f.informant.value = '';
+
+        deleteBtn.disabled = true;
+        saveBtn.textContent = 'Добавить топоним';
+        renderList();
+    }
+
+    function startEdit(id) {
+        const p = places.find(function (x) { return x.id === id; });
+        if (!p) return;
+        editingId = id;
+        fillForm(p);
+        renderList();
+        f.name.focus();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ===== ЧТЕНИЕ ФОРМЫ =====
+    function readForm() {
+        return {
+            type: f.type.value,
+            name: f.name.value.trim(),
+            lat: f.lat.value.trim(),
+            lng: f.lng.value.trim(),
+            subtype: f.subtype.value.trim(),
+            date: f.date.value.trim(),
+            photo: f.photo.value.trim(),
+            photoCaption: f.photoCaption.value.trim(),
+            etymology: f.etymology.value.trim(),
+            informant: f.informant.value.trim()
+        };
+    }
+
+    function validate(data) {
+        if (!data.name) {
+            showHint('Укажите название топонима.', true);
+            f.name.focus();
+            return false;
+        }
+        const lat = parseFloat(data.lat);
+        const lng = parseFloat(data.lng);
+        if (!isFinite(lat) || lat < -90 || lat > 90) {
+            showHint('Широта должна быть числом от -90 до 90.', true);
+            f.lat.focus();
+            return false;
+        }
+        if (!isFinite(lng) || lng < -180 || lng > 180) {
+            showHint('Долгота должна быть числом от -180 до 180.', true);
+            f.lng.focus();
+            return false;
+        }
+        return true;
+    }
+
+    // ===== ДЕЙСТВИЯ =====
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const data = readForm();
+        if (!validate(data)) return;
+
+        data.lat = parseFloat(data.lat);
+        data.lng = parseFloat(data.lng);
+
+        // Удаляем пустые поля, чтобы не засорять places.js
+        Object.keys(data).forEach(function (k) {
+            if (data[k] === '' || data[k] === null || data[k] === undefined) {
+                delete data[k];
+            }
+        });
+
+        if (editingId === null) {
+            data.id = nextId();
+            places.push(data);
+            editingId = data.id;
+            showHint('Топоним «' + data.name + '» добавлен.');
+        } else {
+            const idx = places.findIndex(function (x) { return x.id === editingId; });
+            data.id = editingId;
+            if (idx >= 0) {
+                places[idx] = data;
+            } else {
+                places.push(data);
+            }
+            showHint('Изменения сохранены.');
+        }
+
+        persist();
+        renderList();
+        fillForm(data);
+    });
+
+    document.getElementById('newBtn').addEventListener('click', function () {
+        clearForm();
+        f.name.focus();
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', function () {
+        clearForm();
+    });
+
+    document.getElementById('dupBtn').addEventListener('click', function () {
+        const data = readForm();
+        if (!data.name && !data.lat) {
+            showHint('Сначала заполните хотя бы название и координаты.', true);
+            return;
+        }
+        data.name = (data.name || 'Без названия') + ' (копия)';
+        if (data.lat !== '') data.lat = parseFloat(data.lat);
+        if (data.lng !== '') data.lng = parseFloat(data.lng);
+        Object.keys(data).forEach(function (k) {
+            if (data[k] === '' || data[k] === null || data[k] === undefined) delete data[k];
+        });
+        data.id = nextId();
+        places.push(data);
+        editingId = data.id;
+        persist();
+        renderList();
+        fillForm(data);
+        showHint('Создана копия топонима.');
+    });
+
+    deleteBtn.addEventListener('click', function () {
+        if (!editingId) return;
+        const p = places.find(function (x) { return x.id === editingId; });
+        const label = p ? p.name : editingId;
+        if (!confirm('Удалить топоним «' + label + '»? Действие нельзя отменить.')) return;
+
+        places = places.filter(function (x) { return x.id !== editingId; });
+        persist();
+        clearForm();
+        showHint('Топоним удалён.');
+    });
+
+    // ===== ПОИСК =====
+    searchInput.addEventListener('input', function () {
+        searchQuery = searchInput.value;
+        renderList();
+    });
+
+    // ===== ИМПОРТ =====
+    document.getElementById('fileInput').addEventListener('change', function (e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+            try {
+                const data = parsePlacesFile(String(ev.target.result));
+                if (places.length && !confirm('Заменить текущий список (' + places.length + ' шт.) данными из файла (' + data.length + ' шт.)?')) {
+                    return;
+                }
+                places = data.map(function (p) {
+                    return Object.assign({}, p, { id: String(p.id) });
+                });
+                editingId = null;
+                persist();
+                clearForm();
+                renderList();
+                showHint('Загружено ' + places.length + ' топонимов.');
+            } catch (err) {
+                showHint('Ошибка разбора файла: ' + err.message, true);
+                console.error(err);
+            }
+        };
+        reader.readAsText(file, 'utf-8');
+        e.target.value = '';
+    });
+
+    // ===== ЭКСПОРТ =====
+    function downloadFile() {
+        const blob = new Blob([buildFileContent()], { type: 'text/javascript;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'places.js';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    }
+
+    document.getElementById('exportBtn').addEventListener('click', function () {
+        if (!places.length) {
+            showHint('Список пуст — нечего сохранять.', true);
+            return;
+        }
+        downloadFile();
+        showHint('Файл places.js сохранён. Загрузите его в репозиторий GitHub.');
+    });
+
+    // ===== МОДАЛКА С КОДОМ =====
+    function openCodeModal() {
+        codeArea.value = buildFileContent();
+        codeModal.classList.add('modal--open');
+        setTimeout(function () { codeArea.focus(); codeArea.select(); }, 50);
+    }
+
+    function closeCodeModal() {
+        codeModal.classList.remove('modal--open');
+    }
+
+    document.getElementById('showCodeBtn').addEventListener('click', openCodeModal);
+    document.getElementById('codeModalClose').addEventListener('click', closeCodeModal);
+    document.getElementById('downloadFromModal').addEventListener('click', downloadFile);
+
+    codeModal.addEventListener('click', function (e) {
+        if (e.target === codeModal) closeCodeModal();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && codeModal.classList.contains('modal--open')) {
+            closeCodeModal();
+        }
+        // Ctrl/Cmd + S — быстрый экспорт
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+            e.preventDefault();
+            if (places.length) downloadFile();
+        }
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', function () {
+        codeArea.select();
+        codeArea.setSelectionRange(0, codeArea.value.length);
+        let ok = false;
+        try {
+            ok = document.execCommand('copy');
+        } catch (err) { ok = false; }
+
+        if (ok) {
+            showHint('Код скопирован в буфер обмена.');
+        } else if (navigator.clipboard) {
+            navigator.clipboard.writeText(codeArea.value).then(function () {
+                showHint('Код скопирован в буфер обмена.');
+            }).catch(function () {
+                showHint('Не удалось скопировать. Выделите текст и нажмите Ctrl+C.', true);
+            });
+        } else {
+            showHint('Не удалось скопировать. Выделите текст и нажмите Ctrl+C.', true);
+        }
+    });
+
+    // ===== СТАРТ =====
+    restore();
+    clearForm();
+    renderList();
+
+    if (!places.length) {
+        showHint('Загрузите существующий places.js кнопкой вверху — или начните с нового топонима.');
+    }
+
+})();
+</script>
+</body>
+</html>
