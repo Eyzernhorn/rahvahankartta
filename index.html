@@ -332,6 +332,46 @@
             text-decoration: underline;
         }
 
+        .leaflet-control-layers {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: 1px solid var(--border-light) !important;
+            border-radius: var(--radius-md) !important;
+            box-shadow: var(--shadow-soft) !important;
+            font-family: var(--font-body) !important;
+            backdrop-filter: blur(4px);
+            padding: 4px 0 !important;
+        }
+        
+        .leaflet-control-layers-toggle {
+            background-color: #fff !important;
+            border-radius: var(--radius-sm) !important;
+        }
+        
+        .leaflet-control-layers-expanded {
+            padding: 10px 14px !important;
+            min-width: 190px;
+        }
+        
+        .leaflet-control-layers-separator {
+            border-top: 1px solid var(--border-light) !important;
+            margin: 6px 0 !important;
+        }
+        
+        .leaflet-control-layers label {
+            font-size: 0.88rem !important;
+            color: var(--text-secondary) !important;
+            letter-spacing: 0.01em;
+            margin-bottom: 3px;
+            display: flex !important;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        
+        .leaflet-control-layers input[type="checkbox"] {
+            accent-color: var(--accent-blue);
+            cursor: pointer;
+        }
         .custom-div-icon {
             background: none;
             border: none;
@@ -959,58 +999,89 @@
             const markersArray = [];
             const markerToDataMap = new Map();
             let activeMarkerDataId = null;
-
-            placesData.forEach((place) => {
-                if (typeof place.lat !== 'number' || typeof place.lng !== 'number') {
-                    return;
+            
+            const typeNames = {
+                водоём: 'Водоёмы',
+                река: 'Реки',
+                лес: 'Леса',
+                гора: 'Горы',
+                дорога: 'Дороги',
+                болото: 'Болота',
+                остров: 'Острова',
+                порог: 'Пороги',
+                мыс: 'Мысы',
+                место: 'Места'
+            };
+            
+            const layerGroups = {};
+            
+            placesData.forEach(function (place) {
+                if (typeof place.lat !== 'number' || typeof place.lng !== 'number') return;
+                const type = place.type || 'место';
+                if (!layerGroups[type]) {
+                    layerGroups[type] = L.layerGroup();
                 }
-
+            });
+            
+            placesData.forEach(function (place) {
+                if (typeof place.lat !== 'number' || typeof place.lng !== 'number') return;
+            
+                const type = place.type || 'место';
+            
                 const icon = L.divIcon({
                     className: 'custom-div-icon',
-                    html: `<div class="marker-icon">${getIconForPlace(place)}</div>`,
+                    html: '<div class="marker-icon">' + getIconForPlace(place) + '</div>',
                     iconSize: [40, 40],
                     iconAnchor: [20, 20],
-                    popupAnchor: [0, -25],
+                    popupAnchor: [0, -25]
                 });
-
-                const marker = L.marker([place.lat, place.lng], { icon: icon });
-                marker.addTo(map);
-
+            
+                const marker = L.marker([place.lat, place.lng], { icon: icon, keyboard: false });
+            
                 marker.bindTooltip(place.name, {
                     permanent: false,
                     direction: 'top',
                     offset: [0, -25],
-                    opacity: 0.9,
+                    opacity: 0.9
                 });
-
-                marker.on('click', function(e) {
+            
+                marker.on('click', function (e) {
                     L.DomEvent.stopPropagation(e.originalEvent);
                     e.originalEvent.stopImmediatePropagation?.();
                     selectPlace(place, marker);
                 });
-
-                marker.on('mouseover', function() {
+            
+                marker.on('mouseover', function () {
                     if (activeMarkerDataId !== place.id) {
                         marker.getElement()?.classList.add('marker-hover');
                     }
                 });
-                marker.on('mouseout', function() {
+                marker.on('mouseout', function () {
                     if (activeMarkerDataId !== place.id) {
                         marker.getElement()?.classList.remove('marker-hover');
                     }
                 });
-
+            
                 markersArray.push(marker);
                 markerToDataMap.set(marker, place);
+            
+                layerGroups[type].addLayer(marker);
             });
-
-            map.on('click', function(e) {
-                const target = e.originalEvent.target;
-                if (target && target.closest('.leaflet-interactive')) {
-                    return;
-                }
-                resetSidebar();
+            
+            Object.keys(layerGroups).forEach(function (type) {
+                layerGroups[type].addTo(map);
             });
+            
+            const overlays = {};
+            Object.keys(layerGroups).forEach(function (type) {
+                const label = typeNames[type] || type;
+                overlays[label] = layerGroups[type];
+            });
+            
+            L.control.layers(null, overlays, {
+                collapsed: false,     
+                position: 'topright'
+            }).addTo(map);
 
             function selectPlace(place, marker) {
                 markersArray.forEach(m => {
@@ -1026,7 +1097,6 @@
                 sidebarInfoCard.classList.add('sidebar__info-card--visible');
                 placeNameEl.textContent = place.name;
 
-// Определяем наличие данных
 const hasPhoto = place.photo && place.photo !== '-' && place.photo.trim() !== '';
 const hasPhotoCaption = place.photoCaption && place.photoCaption.trim() !== '';
 const hasEtymology = place.etymology && place.etymology !== '-' && place.etymology.trim() !== '';
@@ -1035,7 +1105,6 @@ const hasInformant = place.informant && place.informant !== '-' && place.informa
 const hasAnyInfo = hasPhoto || hasPhotoCaption || hasEtymology || hasDate || hasInformant;
 
 if (!hasAnyInfo) {
-    // Нет никакой информации, кроме названия
     document.querySelector('.sidebar__photo-wrapper').style.display = 'none';
     document.getElementById('placePhotoCaption').style.display = 'none';
     document.querySelector('.sidebar__etymology').style.display = 'none';
@@ -1045,7 +1114,6 @@ if (!hasAnyInfo) {
 } else {
     placeNoInfoEl.style.display = 'none';
 
-    // ----- Фото и подпись -----
     const photoWrapper = document.querySelector('.sidebar__photo-wrapper');
     const photoCaption = document.getElementById('placePhotoCaption');
     if (hasPhoto) {
