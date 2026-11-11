@@ -182,6 +182,9 @@
         }
 
         .sidebar__info-card {
+           <h2 class="sidebar__place-name" id="placeName"></h2>
+            <p class="sidebar__place-subtype" id="placeSubtype" style="display: none;"></p>
+            <p class="sidebar__no-info" id="placeNoInfo" style="display: none;">Пока информация об этом названии отсутствует.</p>
             display: none;
             flex-direction: column;
             width: 100%;
@@ -213,6 +216,17 @@
             text-align: left;
         }
 
+        .sidebar__place-subtype {
+            font-size: 0.82rem;
+            color: var(--accent-blue-hover);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: -10px;
+            margin-bottom: 14px;
+            text-align: left;
+        }
+        
         .sidebar__photo-wrapper {
             width: 100%;
             border-radius: var(--radius-md);
@@ -930,7 +944,7 @@
   { id: '11', lat: 64.084697, lng: 32.775296, name: 'Школьный мыс', type: 'мыс', photo: 'photo_jpg/shkolanniemi.jpg', photoCaption: 'Фотография автора проекта', etymology: '-' },
   { id: '12', lat: 64.336488, lng: 32.367095, name: 'Чуккури', type: 'гора', photo: '-', photoCaption: '-', etymology: 'Название произошло от карельского čukkuri, что означает возвышенность.' },
   { id: '13', lat: 64.242431, lng: 32.377223, name: 'Хауда-порог', type: 'порог', photo: '-', photoCaption: '-', etymology: 'В переводе с карельского hauda (hauta) означает яма, углубление, ложбина или впадина.' },
-  { id: '14', lat: 64.119892, lng: 32.397562, name: 'Хутка', type: 'водоём', photo: 'photo_jpg/hutto.jpg', photoCaption: 'Вид на Хутоламбину со стороны ул. Набережная. Фотография автора проекта.', etymology: 'Полное название Хутоламбина. Ламбина в посёлке Тишка. Название произошло от карельского huttu - место (болото) с мягкой почвой.' },
+  { id: '14', lat: 64.119892, lng: 32.397562, name: 'Хутка', type: 'водоём', subtype: 'ламбина', photo: 'photo_jpg/hutto.jpg', photoCaption: 'Вид на Хутоламбину со стороны ул. Набережная. Фотография автора проекта.', etymology: 'Полное название Хутоламбина. Ламбина в посёлке Тишка. Название произошло от карельского huttu - место (болото) с мягкой почвой.' },
   { id: '15', lat: 64.214144, lng: 32.387351, name: 'Лоухи-порог', type: 'порог'},
   { id: '16', lat: 64.251703, lng: 32.438857, name: 'Орголамбина', type: 'водоём'},
   { id: '17', lat: 64.125816, lng: 32.668157, name: 'Цыганская ламбина', type: 'водоём', date: '50-70-е годы XX века'},
@@ -1022,6 +1036,7 @@
             const sidebarPlaceholder = document.getElementById('sidebarPlaceholder');
             const sidebarInfoCard = document.getElementById('sidebarInfoCard');
             const placeNameEl = document.getElementById('placeName');
+            const placeSubtypeEl = document.getElementById('placeSubtype');
             const placePhotoEl = document.getElementById('placePhoto');
             const placePhotoCaptionEl = document.getElementById('placePhotoCaption');
             const placeEtymologyEl = document.getElementById('placeEtymology');
@@ -1242,7 +1257,13 @@
                 sidebarPlaceholder.style.display = 'none';
                 sidebarInfoCard.classList.add('sidebar__info-card--visible');
                 placeNameEl.textContent = place.name;
-
+if (place.subtype && place.subtype.trim() !== '' && place.subtype !== '-') {
+    placeSubtypeEl.textContent = place.subtype;
+    placeSubtypeEl.style.display = 'block';
+} else {
+    placeSubtypeEl.textContent = '';
+    placeSubtypeEl.style.display = 'none';
+}
 const hasPhoto = place.photo && place.photo !== '-' && place.photo.trim() !== '';
 const hasPhotoCaption = place.photoCaption && place.photoCaption.trim() !== '';
 const hasEtymology = place.etymology && place.etymology !== '-' && place.etymology.trim() !== '';
@@ -1345,6 +1366,9 @@ if (!hasAnyInfo) {
     placeEtymologyEl.textContent = '';
     placeDateEl.textContent = '';
     placeInformantEl.textContent = '';
+    placeNameEl.textContent = '';
+    placeSubtypeEl.textContent = '';
+    placeSubtypeEl.style.display = 'none';
 
     // Восстанавливаем видимость блоков
     document.querySelector('.sidebar__photo-wrapper').style.display = 'block';
