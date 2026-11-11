@@ -332,45 +332,111 @@
             text-decoration: underline;
         }
 
-        .leaflet-control-layers {
-            background: rgba(255, 255, 255, 0.95) !important;
-            border: 1px solid var(--border-light) !important;
-            border-radius: var(--radius-md) !important;
-            box-shadow: var(--shadow-soft) !important;
-            font-family: var(--font-body) !important;
-            backdrop-filter: blur(4px);
-            padding: 4px 0 !important;
+        .layers-dropdown {
+            position: relative;
+            font-family: var(--font-body);
         }
         
-        .leaflet-control-layers-toggle {
-            background-color: #fff !important;
-            border-radius: var(--radius-sm) !important;
-        }
-        
-        .leaflet-control-layers-expanded {
-            padding: 10px 14px !important;
-            min-width: 190px;
-        }
-        
-        .leaflet-control-layers-separator {
-            border-top: 1px solid var(--border-light) !important;
-            margin: 6px 0 !important;
-        }
-        
-        .leaflet-control-layers label {
-            font-size: 0.88rem !important;
-            color: var(--text-secondary) !important;
-            letter-spacing: 0.01em;
-            margin-bottom: 3px;
-            display: flex !important;
+        .layers-dropdown__toggle {
+            display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-soft);
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
             cursor: pointer;
+            backdrop-filter: blur(4px);
+            transition: background 0.2s ease, border-color 0.2s ease;
+            user-select: none;
+            white-space: nowrap;
+        }
+        .layers-dropdown__toggle:hover {
+            background: #fff;
+            border-color: var(--accent-blue);
+            color: #4a6d7c;
         }
         
-        .leaflet-control-layers input[type="checkbox"] {
+        .layers-dropdown__arrow {
+            font-size: 0.7rem;
+            transition: transform 0.25s ease;
+            display: inline-block;
+        }
+        .layers-dropdown--open .layers-dropdown__arrow {
+            transform: rotate(180deg);
+        }
+        
+        .layers-dropdown__panel {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            min-width: 195px;
+            background: rgba(255, 255, 255, 0.97);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-card);
+            padding: 8px 0;
+            display: none;
+            backdrop-filter: blur(4px);
+            max-height: 340px;
+            overflow-y: auto;
+        }
+        .layers-dropdown--open .layers-dropdown__panel {
+            display: block;
+        }
+        
+        .layers-dropdown__item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 14px;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            letter-spacing: 0.01em;
+            transition: background 0.15s ease;
+        }
+        .layers-dropdown__item:hover {
+            background: rgba(139, 167, 184, 0.12);
+            color: #4a6d7c;
+        }
+        
+        .layers-dropdown__item input[type="checkbox"] {
             accent-color: var(--accent-blue);
             cursor: pointer;
+            margin: 0;
+            flex-shrink: 0;
+        }
+        
+        .layers-dropdown__actions {
+            display: flex;
+            gap: 6px;
+            padding: 6px 14px 8px;
+            border-top: 1px solid var(--border-light);
+            margin-top: 4px;
+        }
+        
+        .layers-dropdown__action {
+            flex: 1;
+            padding: 5px 8px;
+            font-size: 0.78rem;
+            font-family: var(--font-body);
+            color: var(--accent-blue-hover);
+            background: transparent;
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            letter-spacing: 0.01em;
+        }
+        .layers-dropdown__action:hover {
+            background: rgba(139, 167, 184, 0.15);
+            border-color: var(--accent-blue);
         }
         .custom-div-icon {
             background: none;
@@ -1072,16 +1138,96 @@
                 layerGroups[type].addTo(map);
             });
             
-            const overlays = {};
-            Object.keys(layerGroups).forEach(function (type) {
-                const label = typeNames[type] || type;
-                overlays[label] = layerGroups[type];
+            // ===== ВЫПАДАЮЩИЙ КОНТРОЛ СЛОЁВ =====
+            const LayersDropdown = L.Control.extend({
+                options: { position: 'topright' },
+            
+                onAdd: function () {
+                    const container = L.DomUtil.create('div', 'layers-dropdown leaflet-bar');
+            
+                    // Кнопка-переключатель
+                    const toggle = L.DomUtil.create('button', 'layers-dropdown__toggle', container);
+                    toggle.type = 'button';
+                    toggle.innerHTML = 'Слои <span class="layers-dropdown__arrow">▼</span>';
+            
+                    // Панель со списком
+                    const panel = L.DomUtil.create('div', 'layers-dropdown__panel', container);
+            
+                    // Элементы списка по типам
+                    Object.keys(layerGroups).forEach(function (type) {
+                        const label = typeNames[type] || type;
+            
+                        const item = L.DomUtil.create('label', 'layers-dropdown__item', panel);
+            
+                        const checkbox = L.DomUtil.create('input', '', item);
+                        checkbox.type = 'checkbox';
+                        checkbox.checked = true; // все включены изначально
+            
+                        checkbox.addEventListener('change', function () {
+                            if (checkbox.checked) {
+                                layerGroups[type].addTo(map);
+                            } else {
+                                layerGroups[type].removeFrom(map);
+                            }
+                        });
+            
+                        const text = document.createElement('span');
+                        text.textContent = label;
+                        item.appendChild(text);
+                    });
+            
+                    // Кнопки «Все» / «Ничего»
+                    const actions = L.DomUtil.create('div', 'layers-dropdown__actions', panel);
+            
+                    const btnAll = L.DomUtil.create('button', 'layers-dropdown__action', actions);
+                    btnAll.type = 'button';
+                    btnAll.textContent = 'Все';
+                    btnAll.addEventListener('click', function () {
+                        panel.querySelectorAll('input[type="checkbox"]').forEach(function (cb) {
+                            if (!cb.checked) {
+                                cb.checked = true;
+                                cb.dispatchEvent(new Event('change'));
+                            }
+                        });
+                    });
+            
+                    const btnNone = L.DomUtil.create('button', 'layers-dropdown__action', actions);
+                    btnNone.type = 'button';
+                    btnNone.textContent = 'Ничего';
+                    btnNone.addEventListener('click', function () {
+                        panel.querySelectorAll('input[type="checkbox"]').forEach(function (cb) {
+                            if (cb.checked) {
+                                cb.checked = false;
+                                cb.dispatchEvent(new Event('change'));
+                            }
+                        });
+                    });
+            
+                    // Открытие / закрытие панели
+                    toggle.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        container.classList.toggle('layers-dropdown--open');
+                    });
+            
+                    // Клик внутри панели не должен закрывать её
+                    panel.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                    });
+            
+                    // Клик вне контрола закрывает панель
+                    document.addEventListener('click', function () {
+                        container.classList.remove('layers-dropdown--open');
+                    });
+            
+                    // Отключаем прокрутку страницы при взаимодействии с контролом
+                    L.DomEvent.disableScrollPropagation(container);
+                    L.DomEvent.disableClickPropagation(container);
+            
+                    return container;
+                }
             });
             
-            L.control.layers(null, overlays, {
-                collapsed: false,     
-                position: 'topright'
-            }).addTo(map);
+            new LayersDropdown().addTo(map);
 
             function selectPlace(place, marker) {
                 markersArray.forEach(m => {
